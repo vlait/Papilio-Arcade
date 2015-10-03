@@ -106,7 +106,8 @@ NET I_SW(7)		     		LOC = "P36"  | IOSTANDARD = LVTTL; 													# start 2
 NET I_SW(8)					LOC = "P41"  | IOSTANDARD = LVTTL; 													# coin 2
 NET JOYSTICK_GND        LOC = "P12"  | IOSTANDARD = LVTTL;# 												# GND 		pin 8 of DB9 Joystick A connector
 
-
+NET PS2DAT1        LOC="P91"  | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C0
+NET PS2CLK1        LOC="P92"  | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C1
 #NET Wing1_BH15				LOC = "P22"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; #
 #NET Wing1_BH14				LOC = "P25"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; #
 #NET Wing1_BH13				LOC = "P32"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; #

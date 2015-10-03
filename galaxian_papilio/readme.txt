@@ -12,3 +12,6 @@ In order to run Galaxian roms the end user must own a legal copy of the game and
 -Synthesize the design to create your own bitfile with your own ROM file included.
 
 In order to to run the generated bit file make sure you have the Papilio Loader installed and associated with *.bit files. Double click on the "*.bit" file.
+
+Coin/start inputs via the Arcade Megawing/DUO computing shield buttons or F1(coin)/F2(start) on a ps2 keyboard connected to port 1(A)
+Controls via Joystick plugged in the first port or PS/2 keyboard plugged in port 1(A) (arrows, left control for fire)

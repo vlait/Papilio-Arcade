@@ -32,6 +32,10 @@ entity galaxian_top is
 		I_SW         : in  std_logic_vector(8 downto 0);
 		JOYSTICK_GND			  : out	 std_logic;
 		I_RESET_SWn		 : in std_logic;
+		
+		--		PS2
+		PS2CLK1   : inout	std_logic;
+		PS2DAT1   : inout	std_logic;
 
 		--    SOUND OUT
 		O_AUDIO_L : out std_logic;
@@ -157,12 +161,14 @@ architecture RTL of galaxian_top is
 	signal ROM_D              : std_logic_vector( 7 downto 0) := (others => '0');
 	signal rst_count          : std_logic_vector( 3 downto 0) := (others => '0');
 	signal W_9L_Q             : std_logic_vector( 7 downto 0) := (others => '0');
+	signal W_9M_Q             : std_logic_vector( 7 downto 0) := (others => '0');
 	signal W_COL              : std_logic_vector( 2 downto 0) := (others => '0');
 	signal W_B                : std_logic_vector( 1 downto 0) := (others => '0');
 	signal W_G                : std_logic_vector( 2 downto 0) := (others => '0');
 	signal W_R                : std_logic_vector( 2 downto 0) := (others => '0');
 	signal W_SDAT_A           : std_logic_vector( 7 downto 0) := (others => '0');
 	signal W_SDAT_B           : std_logic_vector( 7 downto 0) := (others => '0');
+	signal SDAT						:std_logic_vector( 7 downto 0) := (others => '0');
 	signal W_STARS_B          : std_logic_vector( 1 downto 0) := (others => '0');
 	signal W_STARS_G          : std_logic_vector( 2 downto 0) := (others => '0');
 	signal W_STARS_R          : std_logic_vector( 2 downto 0) := (others => '0');
@@ -179,6 +185,14 @@ architecture RTL of galaxian_top is
 	signal W_WAV_D0           : std_logic_vector( 7 downto 0) := (others => '0');
 	signal W_WAV_D1           : std_logic_vector( 7 downto 0) := (others => '0');
 	signal W_WAV_D2           : std_logic_vector( 7 downto 0) := (others => '0');
+	signal W_NOISE					: std_logic;
+	signal W_BG_SOUND         : std_logic_vector( 3 downto 0) := (others => '0');
+	signal bootup_resetN			: std_logic := '0';
+	--keyboard--
+	signal ps2_codeready      : std_logic := '1';
+	signal ps2_scancode       : std_logic_vector( 9 downto 0) := (others => '0');
+	signal P1_CSJUDLR         : std_logic_vector( 6 downto 0) := (others => '1'); -- player 1 keyboard controls
+	signal P2_CSJUDLR         : std_logic_vector( 6 downto 0) := (others => '1'); -- player 2 keyboard controls
 --
 --	component MC_VIDEO
 --	port (
@@ -399,7 +413,7 @@ begin
 		O_R          => W_STARS_R,
 		O_G          => W_STARS_G,
 		O_B          => W_STARS_B,
-		O_NOISE      => open
+		O_NOISE      => W_NOISE
 	);
 
 	mix : entity work.MC_VIDEO_MIX
@@ -453,24 +467,24 @@ begin
 
 	vmc_sound_b : entity work.MC_SOUND_B
 	port map(
-		I_CLK1   => W_CLK_18M,
-		I_CLK2   => W_CLK_6M,
+		I_CLK   => W_CLK_6M,
 		I_RSTn   => rst_count(3),
-		I_SW     => new_sw ,
-		O_WAV_A0 => W_WAV_A0,
-		O_WAV_A1 => W_WAV_A1,
-		O_WAV_A2 => W_WAV_A2,
-		I_WAV_D0 => W_WAV_D0,
-		I_WAV_D1 => W_WAV_D1,
-		I_WAV_D2 => W_WAV_D2,
+		I_HIT    => W_HIT,
+		I_FIRE   => W_FIRE,
+		I_NOISE => W_NOISE,
+		I_BG_SOUND   => W_BG_SOUND,
+		I_FS1   => W_FS1,
+		I_FS2   => W_FS2,
+		I_FS3   => W_FS3,
 		O_SDAT   => W_SDAT_B
 	);
-
+	SDAT <= ('0'&W_SDAT_A(7 downto 1)) + W_SDAT_B;
+	
 	wav_dac_a : entity work.dac
 	port map(
 		clk_i   => W_CLK_18M,
 		res_n_i => W_RESETn,
-		dac_i   => W_SDAT_A,
+		dac_i   => SDAT, --('0'&W_SDAT_A(7 downto 1)) + W_SDAT_B, -- W_SDAT_A,
 		dac_o   => W_DAC_A
 	);
 
@@ -482,17 +496,70 @@ begin
 		dac_o   => W_DAC_B
 	);
 
---------- BUTTONS       ---------------------
-	U1 <= not I_SW(0) when HWSEL_GALAXIAN  else I_SW(0);
-   D1 <= not I_SW(1) when HWSEL_GALAXIAN  else I_SW(1);
-   L1 <= not I_SW(2) when HWSEL_GALAXIAN  else I_SW(3);
-   R1 <= not I_SW(3) when HWSEL_GALAXIAN  else I_SW(2);
-   J1 <= not I_SW(4) when HWSEL_GALAXIAN  else I_SW(4);
+--------- KEYBOARD --------------------------
 	
-	S1 <= not I_SW(5);
+	inst_kbd : entity work.Keyboard
+		generic map (clk_freq => 36) 
+		port map (
+			Reset     => not W_RESETn,
+			Clock     => W_CLK_36M,
+			PS2Clock  => PS2CLK1,
+			PS2Data   => PS2DAT1,
+			CodeReady => ps2_codeready,  --: out STD_LOGIC;
+			ScanCode  => ps2_scancode    --: out STD_LOGIC_VECTOR(9 downto 0)
+		);
+
+
+	--	http://www.computer-engineering.org/ps2keyboard/scancodes2.html
+	-- ScanCode(9)          : 1 = Extended  0 = Regular
+	-- ScanCode(8)          : 1 = Break     0 = Make
+	-- ScanCode(7 downto 0) : Key Code
+	process(W_CLK_36M)
+	begin
+		if rising_edge(W_CLK_36M) then
+			if W_RESETn = '0' then
+				P1_CSJUDLR <= (others=>'1'); --active low inputs
+				P2_CSJUDLR <= (others=>'1');
+			elsif (ps2_codeready = '1') then
+				case (ps2_scancode(7 downto 0)) is
+					when x"05" =>	P1_CSJUDLR(6) <=  ps2_scancode(8);     -- P1 coin "F1"
+					--when x"04" =>	P2_CSJUDLR(6) <=  ps2_scancode(8);     -- P2 coin "F3"
+
+					when x"06" =>	P1_CSJUDLR(5) <=  ps2_scancode(8);     -- P1 start "F2"
+					--when x"0c" =>	P2_CSJUDLR(5) <=  ps2_scancode(8);     -- P2 start "F4"
+
+					when x"14" =>	P1_CSJUDLR(4) <=  ps2_scancode(8);     -- P1 jump "LCTRL"
+										--P2_CSJUDLR(4) <=  ps2_scancode(8);     -- P2 jump "I"
+
+					when x"75" =>	P1_CSJUDLR(3) <=  ps2_scancode(8);     -- P1 up arrow
+										--P2_CSJUDLR(3) <=  ps2_scancode(8);     -- P2 up arrow
+
+					when x"72" =>	P1_CSJUDLR(2) <=  ps2_scancode(8);     -- P1 down arrow
+										--P2_CSJUDLR(2) <=  ps2_scancode(8);     -- P2 down arrow
+
+					when x"6b" =>	P1_CSJUDLR(1) <=  ps2_scancode(8);     -- P1 left arrow
+										--P2_CSJUDLR(1) <=  ps2_scancode(8);     -- P2 left arrow
+
+					when x"74" =>	P1_CSJUDLR(0) <=  ps2_scancode(8);     -- P1 right arrow
+										--P2_CSJUDLR(0) <=  ps2_scancode(8);     -- P2 right arrow
+
+					when others => null;
+				end case;
+			end if;
+		end if;
+	end process;
+
+--------- BUTTONS       ---------------------
+	U1 <= not (I_SW(0) and P1_CSJUDLR(3)) when HWSEL_GALAXIAN  else (I_SW(0) and P1_CSJUDLR(3));
+   D1 <= not (I_SW(1) and P1_CSJUDLR(2)) when HWSEL_GALAXIAN  else (I_SW(1) and P1_CSJUDLR(2));
+   L1 <= not (I_SW(2) and P1_CSJUDLR(0)) when HWSEL_GALAXIAN  else (I_SW(3) and P1_CSJUDLR(0));
+   R1 <= not (I_SW(3) and P1_CSJUDLR(1)) when HWSEL_GALAXIAN  else (I_SW(2) and P1_CSJUDLR(1));
+   J1 <= (I_SW(4) and P1_CSJUDLR(4)) when HWSEL_GALAXIAN  else (I_SW(4) and P1_CSJUDLR(4));
+	
+	S1 <= not (I_SW(5) or not P1_CSJUDLR(5)) ;
 	S2 <= not I_SW(7);
 
-	C1 <= not I_SW(6);
+	C1 <= not (I_SW(6) or not P1_CSJUDLR(6)) ;
 	C2 <= not I_SW(8);	
 
 --	S1 <= not I_SW(5);
@@ -530,10 +597,15 @@ begin
 	W_RESETn  <= not I_RESET_SWn;
 	W_BDO     <= W_SW_DO  or W_VID_DO or W_CPU_RAM_DO or W_CPU_ROM_DOB ;
 
-
+	process (WB_CLK_6M)
+	begin 
+		if falling_edge(WB_CLK_6M) then
+			bootup_resetN <= '1';
+		end if;
+	end process;
 ---------- SOUND I/F -----------------------------
 	O_AUDIO_L <= W_DAC_A;
-	O_AUDIO_R <= W_DAC_B;
+	O_AUDIO_R <= W_DAC_A; --W_DAC_B;
 
 	new_sw <= (on_game(1) and on_game(0)) & W_HIT & W_FIRE;
 
@@ -578,6 +650,35 @@ begin
 	W_FS3  <= W_9L_Q(2);
 	W_FS2  <= W_9L_Q(1);
 	W_FS1  <= W_9L_Q(0);
+	
+	-----  Parts 9M ---------
+
+	process(W_CLK_12M, W_RESETn)
+	begin
+		if (W_RESETn = '0') then
+			W_9M_Q <= (others => '0');
+		elsif rising_edge(W_CLK_12M) then
+			if (W_LAMP_WEn = '0') then
+				case(W_A(2 downto 0)) is
+					when "000" => W_9M_Q(0) <= W_BDI(0);
+					when "001" => W_9M_Q(1) <= W_BDI(0);
+					when "010" => W_9M_Q(2) <= W_BDI(0);
+					when "011" => W_9M_Q(3) <= W_BDI(0);
+					when "100" => W_9M_Q(4) <= W_BDI(0);
+					when "101" => W_9M_Q(5) <= W_BDI(0);
+					when "110" => W_9M_Q(6) <= W_BDI(0);
+					when "111" => W_9M_Q(7) <= W_BDI(0);
+					when others => null;
+				end case;
+			end if;
+		end if;
+	end process;
+
+	W_BG_SOUND(3) <= W_9M_Q(7);
+	W_BG_SOUND(2) <= W_9M_Q(6);
+	W_BG_SOUND(1) <= W_9M_Q(5);
+	W_BG_SOUND(0)  <= W_9M_Q(4);
+
 
 ------ CPU DATA WATCH -------------------------------
 	ZMWR <= W_CPU_MREQn or W_CPU_WRn ;

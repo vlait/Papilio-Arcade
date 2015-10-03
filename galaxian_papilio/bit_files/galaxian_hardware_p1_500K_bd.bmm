@@ -20,7 +20,7 @@ ADDRESS_MAP avrmap PPC405 0
 
     ADDRESS_SPACE galaxian_6l RAMB16 [0x00000000:0x000007FF]
         BUS_BLOCK
-            mc_col_pal/galaxian_6l/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X1Y3;
+            mc_col_pal/galaxian_6l/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X1Y8;
         END_BUS_BLOCK;
     END_ADDRESS_SPACE;
 
@@ -33,7 +33,7 @@ ADDRESS_MAP avrmap PPC405 0
 
     ADDRESS_SPACE rom_1k RAMB16 [0x00000000:0x000007FF]
         BUS_BLOCK
-            mc_vid/k_rom/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X1Y8;
+            mc_vid/k_rom/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X1Y6;
         END_BUS_BLOCK;
     END_ADDRESS_SPACE;
 
@@ -46,7 +46,7 @@ ADDRESS_MAP avrmap PPC405 0
 
     ADDRESS_SPACE rom_1h RAMB16 [0x00000000:0x000007FF]
         BUS_BLOCK
-            mc_vid/h_rom/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X1Y7;
+            mc_vid/h_rom/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X1Y5;
         END_BUS_BLOCK;
     END_ADDRESS_SPACE;
 
@@ -59,35 +59,35 @@ ADDRESS_MAP avrmap PPC405 0
 
     ADDRESS_SPACE rom_code RAMB16 [0x00000000:0x00003FFF]
         BUS_BLOCK
-            roms/u_rom/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X0Y6;
+            roms/u_rom/rom0.inst RAMB16 [7:0] [0:2047] PLACED = X0Y1;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom1.inst RAMB16 [7:0] [2048:4095] PLACED = X0Y5;
+            roms/u_rom/rom1.inst RAMB16 [7:0] [2048:4095] PLACED = X0Y2;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom2.inst RAMB16 [7:0] [4096:6143] PLACED = X0Y2;
+            roms/u_rom/rom2.inst RAMB16 [7:0] [4096:6143] PLACED = X1Y0;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom3.inst RAMB16 [7:0] [6144:8191] PLACED = X0Y3;
+            roms/u_rom/rom3.inst RAMB16 [7:0] [6144:8191] PLACED = X1Y1;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom4.inst RAMB16 [7:0] [8192:10239] PLACED = X0Y1;
+            roms/u_rom/rom4.inst RAMB16 [7:0] [8192:10239] PLACED = X0Y4;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom5.inst RAMB16 [7:0] [10240:12287] PLACED = X0Y4;
+            roms/u_rom/rom5.inst RAMB16 [7:0] [10240:12287] PLACED = X0Y3;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom6.inst RAMB16 [7:0] [12288:14335] PLACED = X0Y8;
+            roms/u_rom/rom6.inst RAMB16 [7:0] [12288:14335] PLACED = X0Y5;
         END_BUS_BLOCK;
 
         BUS_BLOCK
-            roms/u_rom/rom7.inst RAMB16 [7:0] [14336:16383] PLACED = X0Y7;
+            roms/u_rom/rom7.inst RAMB16 [7:0] [14336:16383] PLACED = X0Y6;
         END_BUS_BLOCK;
     END_ADDRESS_SPACE;
 

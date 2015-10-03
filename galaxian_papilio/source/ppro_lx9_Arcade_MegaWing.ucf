@@ -96,4 +96,6 @@ NET O_VIDEO_R(0)				LOC = "P118"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST
 NET O_VIDEO_R(1)				LOC = "P119"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST ; #
 NET O_VIDEO_R(2)				LOC = "P120"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST ; #
 NET O_VIDEO_R(3)				LOC = "P121"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST ; #
+NET PS2DAT1        LOC="P114" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C0
+NET PS2CLK1        LOC="P115" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C1
 ##########End of Section for Papilio Arcade MegaWing ###############################################
