@@ -104,7 +104,8 @@ NET JOYSTICK_GND        	LOC = "P131"  | IOSTANDARD = LVTTL;# 												# GND 
 #NET I_SW(0)					LOC = "P32"	 | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; 	# fire/cred	pin 6 of DB9 Joystick B connector
 #NET JOYSTICK_GND		      LOC = "P18"  | IOSTANDARD = LVTTL;#													# GND 		pin 8 of DB9 Joystick B connector
 ##NET Joystick_9				LOC = "P26"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; 	# ?			pin 9 of DB9 Joystick B connector
-
+NET PS2DAT1        LOC="P114" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C0
+NET PS2CLK1        LOC="P115" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C1
 #Push buttons																													#Purpose		#Arcade MegaWing Location
 NET I_BUTTON(5)					LOC = "P59"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST  ;  			# start 2			RIGHT button
 #NET I_BUTTON(6)						LOC = "P54"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST  ;  			# coin 1/credit	UP button

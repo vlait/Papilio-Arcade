@@ -24,11 +24,12 @@ begin
 
 	process(Clock, Reset)
 	begin
+		if rising_edge(Clock) then
 		if Reset = '1' then
 			Output <= '0';
 			Internal <= '0';
 			DelayCounter <= 0;
-		elsif rising_edge(Clock) then
+		else
 			if Input /= Internal then
 				Internal <= Input;
 				DelayCounter <= 0;
@@ -37,6 +38,7 @@ begin
 			else
 				DelayCounter <= DelayCounter + 1;
 			end if;
+		end if;
 		end if;
 	end process;
 

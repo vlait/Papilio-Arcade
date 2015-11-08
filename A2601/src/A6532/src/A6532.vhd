@@ -32,16 +32,19 @@ architecture arch of ram128x8 is
     type ram_type is array (0 to 127) of
         std_logic_vector(7 downto 0);
     signal ram: ram_type;
+	 signal d_tmp : std_logic_vector(7 downto 0);
 begin
 
     process (clk, r, a)
     begin
         if (clk'event and clk = '1') then
             if (r = '1') then
-                d_out <= ram(to_integer(unsigned(a)));
+                d_tmp <= ram(to_integer(unsigned(a)));
             else
                 ram(to_integer(unsigned(a))) <= d_in;
+					 d_tmp <= d_in;
             end if;
+				d_out <= d_tmp;
         end if;
     end process;
 

@@ -40,6 +40,7 @@ begin
 
 	process(Reset, PS2Error, Clock)
 	begin
+		if rising_edge(Clock) then
 		if Reset = '1' or PS2Error = '1' then
 			CapsLock <= '0';
 			NumLock <= '0';
@@ -52,7 +53,7 @@ begin
 			ScanCode <= (others => '0');
 			KbdFound <= '0';
 			State <= Start;
-		elsif rising_edge(Clock) then
+		else
 			case State is
 				when ResetKbd =>
 					if PS2Busy = '0' then
@@ -164,6 +165,7 @@ begin
 					end if;
 				when others => null;
 			end case;
+		end if;
 		end if;
 	end process;
 

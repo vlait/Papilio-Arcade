@@ -90,7 +90,7 @@ architecture arch of A2601NoFlash is
 	
 	-- bank switch and superchip enable options.
 	
-	signal bss: bss_type := BANKF6; 	--bank switching method
+	signal bss: bss_type := BANK00; 	--bank switching method
 	signal sc: std_logic := '1';		--superchip enabled or not
 	 
 	 

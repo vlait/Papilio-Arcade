@@ -73,6 +73,8 @@ entity invaders_top is
 		--
 		JOYSTICK_GND      : out   std_logic;
 		--
+		PS2CLK1			  : inout std_logic;
+		PS2DAT1			  : inout std_logic;
 		I_RESET           : in    std_logic;
 		OSC_IN            : in    std_logic
 		);
@@ -129,6 +131,11 @@ architecture rtl of invaders_top is
 	--
 	signal Audio           : std_logic_vector(7 downto 0);
 	signal AudioPWM        : std_logic;
+	-- keyboard
+	signal P1_CSJUDLR		:std_logic_vector(6 downto 0);
+	signal P2_CSJUDLR		:std_logic_vector(6 downto 0);
+	signal ps2_codeready	:std_logic;
+	signal ps2_scancode		:std_logic_vector(9 downto 0);
 begin
 
   JOYSTICK_GND <= '0';
@@ -268,7 +275,58 @@ begin
 			end if;
 		end if;
 	end process;
+--------- KEYBOARD --------------------------
+	
+	inst_kbd : entity work.Keyboard
+		generic map (clk_freq => 36) 
+		port map (
+			Reset     => I_RESET,
+			Clock     => Clk,
+			PS2Clock  => PS2CLK1,
+			PS2Data   => PS2DAT1,
+			CodeReady => ps2_codeready,  --: out STD_LOGIC;
+			ScanCode  => ps2_scancode    --: out STD_LOGIC_VECTOR(9 downto 0)
+		);
 
+
+	--	http://www.computer-engineering.org/ps2keyboard/scancodes2.html
+	-- ScanCode(9)          : 1 = Extended  0 = Regular
+	-- ScanCode(8)          : 1 = Break     0 = Make
+	-- ScanCode(7 downto 0) : Key Code
+	process(Clk)
+	begin
+		if rising_edge(Clk) then
+			if I_RESET = '1' then
+				P1_CSJUDLR <= (others=>'1'); --active low inputs
+				P2_CSJUDLR <= (others=>'1');
+			elsif (ps2_codeready = '1') then
+				case (ps2_scancode(7 downto 0)) is
+					when x"05" =>	P1_CSJUDLR(6) <=  ps2_scancode(8);     -- P1 coin "F1"
+					--when x"04" =>	P2_CSJUDLR(6) <=  ps2_scancode(8);     -- P2 coin "F3"
+
+					when x"06" =>	P1_CSJUDLR(5) <=  ps2_scancode(8);     -- P1 start "F2"
+					--when x"0c" =>	P2_CSJUDLR(5) <=  ps2_scancode(8);     -- P2 start "F4"
+
+					when x"14" =>	P1_CSJUDLR(4) <=  ps2_scancode(8);     -- P1 jump "LCTRL"
+										--P2_CSJUDLR(4) <=  ps2_scancode(8);     -- P2 jump "I"
+
+					when x"75" =>	P1_CSJUDLR(3) <=  ps2_scancode(8);     -- P1 up arrow
+										--P2_CSJUDLR(3) <=  ps2_scancode(8);     -- P2 up arrow
+
+					when x"72" =>	P1_CSJUDLR(2) <=  ps2_scancode(8);     -- P1 down arrow
+										--P2_CSJUDLR(2) <=  ps2_scancode(8);     -- P2 down arrow
+
+					when x"6b" =>	P1_CSJUDLR(1) <=  ps2_scancode(8);     -- P1 left arrow
+										--P2_CSJUDLR(1) <=  ps2_scancode(8);     -- P2 left arrow
+
+					when x"74" =>	P1_CSJUDLR(0) <=  ps2_scancode(8);     -- P1 right arrow
+										--P2_CSJUDLR(0) <=  ps2_scancode(8);     -- P2 right arrow
+
+					when others => null;
+				end case;
+			end if;
+		end if;
+	end process;
 
   button_in(7 downto 0) <= I_BUTTON(7 downto 0);
 
@@ -291,11 +349,11 @@ begin
 		if Rst_n_s = '0' then
 			Buttons <= (others => '0');
 		else
-			Buttons(0) <= button_debounced(2); -- Left
-			Buttons(1) <= button_debounced(3); -- Right
-			Buttons(2) <= button_debounced(6); -- Coin
-			Buttons(3) <= button_debounced(7); -- Player1
-			Buttons(4) <= button_debounced(4); -- Fire
+			Buttons(0) <= button_debounced(2) and P1_CSJUDLR(1); -- Left
+			Buttons(1) <= button_debounced(3) and P1_CSJUDLR(0); -- Right
+			Buttons(2) <= button_debounced(6) and P1_CSJUDLR(6); -- Coin
+			Buttons(3) <= button_debounced(7) and P1_CSJUDLR(5); -- Player1
+			Buttons(4) <= button_debounced(4) and P1_CSJUDLR(4); -- Fire
 			Buttons(5) <= button_debounced(5); --2Player start
 		end if;
 	end process;

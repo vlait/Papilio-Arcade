@@ -43,6 +43,9 @@ NET I_BUTTON(4)						LOC = "P133" 	 | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FA
 NET JOYSTICK_GND        	LOC = "P39"  | IOSTANDARD = LVTTL;# 												# GND 		pin 8 of DB9 Joystick A connector
 # small cheat as pin7 is wired to gnd on computing shield, we use led4 to avoid new top level
 
+NET PS2DAT1        LOC="P120" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C0
+NET PS2CLK1        LOC="P121" | IOSTANDARD=LVTTL | DRIVE=8 | SLEW=FAST | PULLUP; # C1
+
 #Joystick B																														#Purpose		#Arcade MegaWing Location
 #NET I_BUTTON(0)				LOC = "PXX"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; 	# up			pin 1 of DB9 Joystick B connector
 #NET I_BUTTON(1)				LOC = "PXX"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = FAST | PULLUP ; 	# down		pin 2 of DB9 Joystick B connector

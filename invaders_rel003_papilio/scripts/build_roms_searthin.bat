@@ -7,7 +7,7 @@ REM 8d9ca92405fbaf1d5a7138d400986616378d061e *earthinv.g
 REM 90bfa4ea06f38e67fe4286d37d151632439249d2 *earthinv.h
 
 set rom_path_src=..\roms\searthin
-set rom_path=..\build
+set rom_path=..\source
 set romgen_path=..\romgen_source
 
 REM concatenate consecutive ROM regions

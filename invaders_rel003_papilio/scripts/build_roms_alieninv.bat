@@ -7,7 +7,7 @@ REM b693667656e5d8f44eeb2ea730f4d4db436da579 *1g.bin
 REM eec34b3d5585bae03c7b80585daaa05ddfcc2164 *1h.bin
 
 set rom_path_src=..\roms\alieninv
-set rom_path=..\build
+set rom_path=..\source
 set romgen_path=..\romgen_source
 
 REM concatenate consecutive ROM regions

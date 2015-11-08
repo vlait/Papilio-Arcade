@@ -70,6 +70,7 @@ begin
 
 	process(Reset, Clock)
 	begin
+		if rising_edge(Clock) then
 		if Reset = '1' then
 			PS2Clock_Z <= '1';
 			PS2ClockOut <= '1';
@@ -87,7 +88,7 @@ begin
 			PS2ClockPrevious <= '1';
 			Byte <= x"FF";
 			State <= InhibitComunication;
-		elsif rising_edge(Clock) then
+		else
 			PS2ClockPrevious <= PS2Clock_D;
 			case State is
 				when Idle =>
@@ -203,6 +204,7 @@ begin
 					end if;
 				when others => null;
 			end case;
+		end if;
 		end if;
 	end process;
 
